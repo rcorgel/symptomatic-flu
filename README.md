@@ -1,1 +1,1 @@
-# symptomatic-flu-proj
+# symptomatic-flu
