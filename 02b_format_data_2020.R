@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: format_data_new                                                   #
+# File Name: format_data_2020                                                  #
 #                                                                              #
 # Purpose:   Format Influenza medical claims data from 2020-2023.              #
 # Steps:                                                                       # 

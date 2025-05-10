@@ -23,6 +23,7 @@ library(tidyverse)
 library(lubridate)
 library(sf)
 library(ISOweek)
+library(cowplot)
 
 # Set the seed
 set.seed(12345)
@@ -45,7 +46,19 @@ flu <- ggplot() +
             color = '#C7A939', linewidth = 1.2, alpha = 0.8) + 
   ylab('Flu Count') + xlab('Week') + 
   ggtitle('Maryland Flu Dynamics, 2016-2020') +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.text = element_text(size = 24),
+        legend.title = element_text(size = 20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=20),
+        legend.position = "bottom",
+        legend.box="vertical",
+        legend.margin=margin(),
+        strip.background = element_blank(),
+        legend.spacing.y = unit(0.25, 'cm'),
+        legend.key.size = unit(1, 'cm'),
+        strip.text = element_text(size = 16),
+        plot.title = element_text(size=20, hjust = 0))
 
 ## PLOT SYMPTOM DYNAMICS ##
 
@@ -64,7 +77,19 @@ symp <- ggplot()+
   theme_minimal() +
   labs(x = "Week", y = "Symptom Count", color = "Symptoms") +
   scale_color_manual(values = colors) + 
-  theme(legend.position = 'bottom')
+  theme_minimal() +
+  theme(legend.text = element_text(size = 16),
+        legend.title = element_text(size = 20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=20),
+        legend.position = "bottom",
+        legend.box="vertical",
+        legend.margin=margin(),
+        strip.background = element_blank(),
+        legend.spacing.y = unit(0.25, 'cm'),
+        legend.key.size = unit(1, 'cm'),
+        strip.text = element_text(size = 16),
+        plot.title = element_text(size=20, hjust = 0))
 
 ## PLOT WEATHER DYNAMICS ## 
 
@@ -87,8 +112,20 @@ temp <- ggplot() +
             aes(x = week_date, y = feelslike), 
             color = '#9086ba', linewidth = 1.2, alpha = 0.8) + 
   ylab('Temerature') + xlab('Week') + 
-  ggtitle('Maryland Temperature Dynamics, 2016-2020') +
-  theme_minimal()
+  ggtitle('Maryland Temperature, 2016-2020') +
+  theme_minimal() +
+  theme(legend.text = element_text(size = 16),
+        legend.title = element_text(size = 20),
+        axis.text = element_text(size=20),
+        axis.title = element_text(size=20),
+        legend.position = "bottom",
+        legend.box="vertical",
+        legend.margin=margin(),
+        strip.background = element_blank(),
+        legend.spacing.y = unit(0.25, 'cm'),
+        legend.key.size = unit(1, 'cm'),
+        strip.text = element_text(size = 16),
+        plot.title = element_text(size=20, hjust = 0))
 
 ## PLOT SPATIAL AND TEMPORAL REPRESENTITIVENESS ##
 
@@ -124,7 +161,7 @@ usa_albers_county_x_walk <- left_join(county_groups[, c(1,2)], usa_albers_county
 usa_albers_county_group <- usa_albers_county_x_walk %>% 
   group_by(county_fips) %>%
   summarise(geometry = sf::st_union(geometry)) %>%
-  ungroup()
+  ungroup() 
 
 # Limit map data to Maryland
 usa_albers_county_group <- usa_albers_county_group |>
@@ -140,13 +177,20 @@ map <- ggplot() +
   geom_sf(data = st_as_sf(usa_albers_county_group), aes(fill = percent, group = county_fips), color= 'black', linewidth = 0.10) +
   geom_sf(data = usa_albers_state, aes(group = STATEFP), fill = '#FFFFFF00', color= 'black', linewidth = 0.3) +
   scale_fill_gradient('Percent    ', low = "white", high = 'black') + ggtitle('Percent of Population Represented, 2019-2020') + 
-  theme_void() + theme(legend.position = 'right',
-                       plot.title = element_text(size = 16, hjust = 0.5),
-                       panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white'),
-                       legend.title = element_text(size = 12),
-                       legend.text = element_text(size = 12),
+  theme_void() + theme(legend.text = element_text(size = 16),
+                       legend.title = element_text(size = 20),
+                       legend.position = "right",
+                       legend.box="vertical",
+                       legend.margin=margin(),
+                       strip.background = element_blank(),
+                       plot.title = element_text(size=20, hjust = 0),
                        legend.key.height = unit(1.2, 'cm'),
-                       legend.key.width = unit(0.5, "cm")) 
+                       legend.key.width = unit(0.5, "cm"),
+                       panel.border = element_rect(fill=NA, linewidth = 0.8, color = 'white'))
+
+
+
+  
 
 # Create line plot
 # Filter data to appropriate time frame
@@ -161,6 +205,14 @@ ggplot() +
   ylab('Percent Observed') + xlab('Week') + 
   ggtitle('Weekly Maryland Population Observed, 2016-2020') +
   theme_minimal()
+
+## COMBINE FIGURES FOR MANUSCRIPT ##
+figure_1 <- cowplot::plot_grid(map, flu, symp, temp,
+                               nrow = 4,
+                               labels = c('A', 'B', 'C', 'D'),
+                               label_size = 26, hjust = 0) 
+
+ggsave('./figs/figure_1.jpg', plot = figure_1, height = 15, width = 11)
 
 ################################################################################
 ################################################################################

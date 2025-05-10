@@ -1,5 +1,5 @@
 ################################################################################
-# File Name: load_symptom_data_new                                             #
+# File Name: load_symptom_data_2020                                            #
 #                                                                              #
 # Purpose:   Load and process Influenza medical claims data from 2020-2023.    #
 # Steps:                                                                       # 
